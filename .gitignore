@@ -1,0 +1,32 @@
+## 1. Carpetas de compilación de .NET (se regeneran solas al compilar)
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+## 2. Archivos temporales y caché de Visual Studio 2022
+.vs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## 3. Configuración local de Visual Studio Code
+.vscode/*
+!.vscode/extensions.json
+
+## 4. Secretos y configuraciones locales sensibles (Seguridad)
+appsettings.Development.json
+appsettings.Local.json
+secrets.json
+*.pfx
+*.publishsettings
+
+## 5. Resultados de pruebas y paquetes temporales
+TestResults/
+*.nupkg
+
+## 6. Archivos ocultos del sistema operativo (Windows / Mac)
+Thumbs.db
+Desktop.ini
+.DS_Store
