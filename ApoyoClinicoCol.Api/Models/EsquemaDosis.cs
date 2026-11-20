@@ -69,14 +69,21 @@ namespace ApoyoClinicoCol.Api.Models
         [Column("fecha_revision")]
         public DateTime? FechaRevision { get; set; }
 
+        // Nuevo campo: ID del usuario (Admin/Médico) que validó clínicamente el esquema
+        [Column("validado_por")]
+        public int? ValidadoPorId { get; set; }
+
         [Column("activo")]
         public bool Activo { get; set; } = true;
 
-        // Relaciones hacia Medicamentos y Fuentes
+        // Relaciones hacia Medicamentos, Fuentes y Usuarios
         [ForeignKey(nameof(MedicamentoId))]
         public Medicamento? Medicamento { get; set; }
 
         [ForeignKey(nameof(FuenteId))]
         public Fuente? Fuente { get; set; }
+
+        [ForeignKey(nameof(ValidadoPorId))]
+        public Usuario? ValidadoPor { get; set; }
     }
 }

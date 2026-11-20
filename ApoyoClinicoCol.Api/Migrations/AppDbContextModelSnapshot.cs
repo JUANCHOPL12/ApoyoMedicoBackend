@@ -111,11 +111,17 @@ namespace ApoyoClinicoCol.Api.Migrations
                         .HasColumnType("decimal(10,2)")
                         .HasColumnName("tope_maximo_dosis_mg");
 
+                    b.Property<int?>("ValidadoPorId")
+                        .HasColumnType("int")
+                        .HasColumnName("validado_por");
+
                     b.HasKey("Id");
 
                     b.HasIndex("FuenteId");
 
                     b.HasIndex("MedicamentoId");
+
+                    b.HasIndex("ValidadoPorId");
 
                     b.ToTable("Esquemas_Dosis", t =>
                         {
@@ -125,7 +131,13 @@ namespace ApoyoClinicoCol.Api.Migrations
 
                             t.HasCheckConstraint("CK_EsquemasDosis_MinMenorHabitual", "[dosis_minima_mg_kg] IS NULL OR [dosis_minima_mg_kg] <= [dosis_habitual_mg_kg]");
 
+                            t.HasCheckConstraint("CK_EsquemasDosis_Positivos", "[dosis_habitual_mg_kg] > 0 AND [frecuencia_horas_defecto] > 0 AND ([dosis_minima_mg_kg] IS NULL OR [dosis_minima_mg_kg] > 0) AND ([dosis_maxima_mg_kg] IS NULL OR [dosis_maxima_mg_kg] > 0) AND ([tope_maximo_dosis_mg] IS NULL OR [tope_maximo_dosis_mg] > 0) AND ([tope_maximo_diario_mg] IS NULL OR [tope_maximo_diario_mg] > 0)");
+
+                            t.HasCheckConstraint("CK_EsquemasDosis_Rangos", "[edad_minima_dias] >= 0 AND ([edad_maxima_dias] IS NULL OR [edad_minima_dias] <= [edad_maxima_dias]) AND ([peso_minimo_kg] IS NULL OR [peso_minimo_kg] > 0) AND ([peso_maximo_kg] IS NULL OR [peso_minimo_kg] IS NULL OR [peso_minimo_kg] <= [peso_maximo_kg])");
+
                             t.HasCheckConstraint("CK_EsquemasDosis_TipoCalculo", "[tipo_calculo] IN ('PorDia', 'PorToma')");
+
+                            t.HasCheckConstraint("CK_EsquemasDosis_ValidadoCompleto", "[estado] <> 'Validado' OR ([fecha_revision] IS NOT NULL AND [validado_por] IS NOT NULL)");
                         });
                 });
 
@@ -255,7 +267,10 @@ namespace ApoyoClinicoCol.Api.Migrations
 
                     b.HasIndex("MedicamentoId");
 
-                    b.ToTable("Presentaciones");
+                    b.ToTable("Presentaciones", t =>
+                        {
+                            t.HasCheckConstraint("CK_Presentaciones_Positivos", "[cantidad_principio_mg] > 0 AND [cantidad_vehiculo] > 0");
+                        });
                 });
 
             modelBuilder.Entity("ApoyoClinicoCol.Api.Models.Usuario", b =>
@@ -374,9 +389,16 @@ namespace ApoyoClinicoCol.Api.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
+                    b.HasOne("ApoyoClinicoCol.Api.Models.Usuario", "ValidadoPor")
+                        .WithMany()
+                        .HasForeignKey("ValidadoPorId")
+                        .OnDelete(DeleteBehavior.Restrict);
+
                     b.Navigation("Fuente");
 
                     b.Navigation("Medicamento");
+
+                    b.Navigation("ValidadoPor");
                 });
 
             modelBuilder.Entity("ApoyoClinicoCol.Api.Models.Presentacion", b =>
@@ -384,7 +406,7 @@ namespace ApoyoClinicoCol.Api.Migrations
                     b.HasOne("ApoyoClinicoCol.Api.Models.Medicamento", "Medicamento")
                         .WithMany("Presentaciones")
                         .HasForeignKey("MedicamentoId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Medicamento");
